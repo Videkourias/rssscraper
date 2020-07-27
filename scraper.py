@@ -1,5 +1,6 @@
 import requests
 import json
+import sys, getopt
 from bs4 import BeautifulSoup
 
 
@@ -49,8 +50,15 @@ def rss(feed, src):
 
 
 print('Starting scraping\n')
-feeds = ['https://www.cbc.ca/cmlink/rss-topstories', 'https://windsorstar.com/feed', 'https://www.ctvnews.ca/rss/ctvnews-ca-top-stories-public-rss-1.822009']
-feed_src = ['CBC News', 'Windsor Star', 'CTV News']
-for i in range(len(feeds)):
-    rss(feeds[i], feed_src[i])
+
+# Load RSS feed data from JSON file
+with open('feeds.json', 'r') as f:
+    data = f.read()
+feeds = json.loads(data)
+
+# Scrape all feeds
+for f in feeds['feeds']:
+    print(f['link'], '\n', f['src'])
+    rss(f['link'], f['src'])
+
 print('Finished scraping')
