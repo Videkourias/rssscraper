@@ -10,10 +10,27 @@ def save_function(article_list):
         json.dump(article_list, outfile)
 
 
-# Windsor Star, CBS, CTV
-def rss(feed, src):
+# Verifies that txt contains all of kwand or any of kwor
+def verify(txt, kwand, kwor):
+    kwall = True
+    kwany = False
+
+    for w in kwand:
+        if w.lower() not in txt:
+            kwall = False
+            break
+
+    for w in kwor:
+        if w.lower() in txt:
+            kwany = True
+            break
+
+    return kwall or kwany
+
+
+# Method to GET RSS feeds from links passed through feed argument
+def rss(feed, src, kwand, kwor):
     article_list = []
-    keywords = ['OGVG', 'Ontario Greenhouse Vegetable Growers', 'Greenhouse', 'COVID-19']
 
     try:
         # Get rss feed using requests and read it using BeautifulSoup
@@ -29,18 +46,14 @@ def rss(feed, src):
             link = a.find('link').text
             published = a.find('pubDate').text
 
-            # Check title for keywords
-            for w in title.split():
-                if w in keywords:
-                    article = {
-                        'title': title,
-                        'link': link,
-                        'published': published,
-                        'src': src
-                    }
-                    article_list.append(article)
-                    # print('Title: {}\nSource: {}\n'.format(title, src))
-                    # print('=================================\n')
+            if verify([w.lower() for w in title.split()], kwand, kwor):
+                article = {
+                    'title': title,
+                    'link': link,
+                    'published': published,
+                    'src': src
+                }
+                article_list.append(article)
 
         return save_function(article_list)
 
@@ -76,7 +89,8 @@ def main(argv):
 
     if kwand or kwor:
         print('Starting scraping\n')
-        print('Searching for articles with title containing all of:\n{}\nor any of:\n{}\n'.format(kwand, kwor))
+        print('Searching for articles with title containing all '
+              'of:\n{}\nor any of:\n{}\n'.format(kwand, kwor))
 
         # Load RSS feed data from JSON file
         with open('feeds.json', 'r') as f:
@@ -85,8 +99,8 @@ def main(argv):
 
         # Scrape all feeds
         for f in feeds['feeds']:
-            pass
-            # rss(f['link'], f['src'])
+            rss('https://windsorstar.com/feed', 'Windsor Star', kwand, kwor)
+            # rss(f['link'], f['src'], kwand, kwor)
 
         print('Finished scraping')
 
