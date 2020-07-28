@@ -1,13 +1,31 @@
 import requests
 import json
-import sys, getopt
+import sys, getopt, os
+import webbrowser
 from bs4 import BeautifulSoup
 
 
 # Function to save article list to file
 def save_function(article_list):
-    with open('articles.txt', 'a') as outfile:
-        json.dump(article_list, outfile)
+    fname = 'articles.json'
+
+    # Check if file already exists
+    if os.path.isfile(fname):
+        with open(fname, 'r') as f:
+            data = json.load(f)
+            articles = data['articles']
+            articles.extend(article_list)
+
+        with open(fname, 'w') as f:
+            json.dump(data, f)
+    else:
+        # Convert list of dictionaries to one dictionary
+        dictionary = {
+            'articles': article_list
+        }
+
+        with open(fname, 'w') as f:
+            json.dump(dictionary, f)
 
 
 # Verifies that txt contains all of kwand or any of kwor
@@ -106,6 +124,29 @@ def main(argv):
 
     else:
         print("No search terms(keywords) have been provided, try using -a or -o. Exiting...")
+
+# Creates HTML page using info pulled from articles.txt
+def createHTML():
+    with open('data.html', 'wb') as f:
+        inner = '''
+        <html>
+        <head><title>Data</title></head>
+        <body>
+            <table>
+                <thead>
+                    <th>Title</th>
+                    <th>Link</th>
+                    <th>Publish Date</th>
+                    <th>Source</th>
+                </thead>
+        '''
+
+
+        inner = inner + '''
+            </table>
+        </body>
+        </html>
+        '''
 
 
 if __name__ == '__main__':
