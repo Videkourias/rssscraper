@@ -28,6 +28,45 @@ def save_function(article_list):
             json.dump(dictionary, f)
 
 
+# Creates HTML page using info pulled from articles.txt
+def createHTML(fname='articles.json'):
+    with open('data.html', 'w') as f:
+        inner = """<!DOCTYPE html>
+        <html>
+        <head><title>Data</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        </head>
+        <body>
+        <table class="table">
+        <thead>
+        <th>Title</th>
+        <th>Link</th>
+        <th>Publish Date</th>
+        <th>Source</th>
+        </thead>
+        <tbody>"""
+
+        with open(fname, 'r') as jdata:
+            data = json.load(jdata)
+            articles = data['articles']
+
+        for a in articles:
+            inner += """<tr>
+            <td>{}</td>
+            <td><a href={}>Link</a></td>
+            <td>{}</td>
+            <td>{}</td>
+            </tr>""".format(a['title'], a['link'], a['published'], a['src'])
+
+        inner += """</tbody>
+        </table>
+        </body>
+        </html>
+        """
+
+        f.write(inner)
+
+
 # Verifies that txt contains all of kwand or any of kwor
 def verify(txt, kwand, kwor):
     kwall = True
@@ -117,8 +156,7 @@ def main(argv):
 
         # Scrape all feeds
         for f in feeds['feeds']:
-            rss('https://windsorstar.com/feed', 'Windsor Star', kwand, kwor)
-            # rss(f['link'], f['src'], kwand, kwor)
+            rss(f['link'], f['src'], kwand, kwor)
 
         print('Finished scraping')
         createHTML()
@@ -126,46 +164,6 @@ def main(argv):
 
     else:
         print("No search terms(keywords) have been provided, try using -a or -o. Exiting...")
-
-
-# Creates HTML page using info pulled from articles.txt
-def createHTML(fname='articles.json'):
-    with open('data.html', 'w') as f:
-        inner = """<!DOCTYPE html>
-        <html>
-        <head><title>Data</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-        </head>
-        <body>
-        <table class="table">
-        <thead>
-        <th>Title</th>
-        <th>Link</th>
-        <th>Publish Date</th>
-        <th>Source</th>
-        </thead>
-        <tbody>"""
-
-        with open(fname, 'r') as jdata:
-            data = json.load(jdata)
-            articles = data['articles']
-
-        for a in articles:
-            inner += """<tr>
-            <td>{}</td>
-            <td><a href={}>Link</a></td>
-            <td>{}</td>
-            <td>{}</td>
-            </tr>""".format(a['title'], a['link'], a['published'], a['src'])
-
-        inner += """</tbody>
-        </table>
-        </body>
-        </html>
-        """
-
-        f.write(inner)
-
 
 
 if __name__ == '__main__':
