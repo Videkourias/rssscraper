@@ -121,32 +121,51 @@ def main(argv):
             # rss(f['link'], f['src'], kwand, kwor)
 
         print('Finished scraping')
+        createHTML()
+        webbrowser.open_new_tab('data.html')
 
     else:
         print("No search terms(keywords) have been provided, try using -a or -o. Exiting...")
 
+
 # Creates HTML page using info pulled from articles.txt
-def createHTML():
-    with open('data.html', 'wb') as f:
-        inner = '''
+def createHTML(fname='articles.json'):
+    with open('data.html', 'w') as f:
+        inner = """<!DOCTYPE html>
         <html>
-        <head><title>Data</title></head>
+        <head><title>Data</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        </head>
         <body>
-            <table>
-                <thead>
-                    <th>Title</th>
-                    <th>Link</th>
-                    <th>Publish Date</th>
-                    <th>Source</th>
-                </thead>
-        '''
+        <table class="table">
+        <thead>
+        <th>Title</th>
+        <th>Link</th>
+        <th>Publish Date</th>
+        <th>Source</th>
+        </thead>
+        <tbody>"""
 
+        with open(fname, 'r') as jdata:
+            data = json.load(jdata)
+            articles = data['articles']
 
-        inner = inner + '''
-            </table>
+        for a in articles:
+            inner += """<tr>
+            <td>{}</td>
+            <td><a href={}>Link</a></td>
+            <td>{}</td>
+            <td>{}</td>
+            </tr>""".format(a['title'], a['link'], a['published'], a['src'])
+
+        inner += """</tbody>
+        </table>
         </body>
         </html>
-        '''
+        """
+
+        f.write(inner)
+
 
 
 if __name__ == '__main__':
