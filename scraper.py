@@ -2,12 +2,16 @@ import requests
 import json
 import sys, getopt, os
 import webbrowser
+import datetime
 from bs4 import BeautifulSoup
+
+date = datetime.date.today().isocalendar()
+datestamp = str(date[1]) + '_' + str(date[0])[2:]
 
 
 # Function to save article list to file
 def save_function(article_list):
-    fname = 'articles.json'
+    fname = 'articles' + datestamp + '.json'
 
     # Check if file already exists
     if os.path.isfile(fname):
@@ -29,11 +33,11 @@ def save_function(article_list):
 
 
 # Creates HTML page using info pulled from articles.txt
-def createHTML(fname='articles.json'):
-    with open('data.html', 'w') as f:
+def createHTML(fname):
+    with open('data' + datestamp + '.html', 'w') as f:
         inner = """<!DOCTYPE html>
         <html>
-        <head><title>Data</title>
+        <head><title>Data: Week {}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         </head>
         <body>
@@ -44,7 +48,7 @@ def createHTML(fname='articles.json'):
         <th>Publish Date</th>
         <th>Source</th>
         </thead>
-        <tbody>"""
+        <tbody>""".format(date[1])
 
         with open(fname, 'r') as jdata:
             data = json.load(jdata)
@@ -53,7 +57,7 @@ def createHTML(fname='articles.json'):
         for a in articles:
             inner += """<tr>
             <td>{}</td>
-            <td><a href={}>Link</a></td>
+            <td><a href="{}">Link</a></td>
             <td>{}</td>
             <td>{}</td>
             </tr>""".format(a['title'], a['link'], a['published'], a['src'])
@@ -69,7 +73,7 @@ def createHTML(fname='articles.json'):
 
 # Verifies that txt contains all of kwand or any of kwor
 def verify(txt, kwand, kwor):
-    kwall = True
+    kwall = True if kwand else False
     kwany = False
 
     for w in kwand:
@@ -159,8 +163,8 @@ def main(argv):
             rss(f['link'], f['src'], kwand, kwor)
 
         print('Finished scraping')
-        createHTML()
-        webbrowser.open_new_tab('data.html')
+        createHTML('articles' + datestamp + '.json')
+        webbrowser.open_new_tab('data' + datestamp + '.html')
 
     else:
         print("No search terms(keywords) have been provided, try using -a or -o. Exiting...")
