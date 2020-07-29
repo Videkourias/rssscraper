@@ -11,7 +11,7 @@ datestamp = str(date[1]) + '_' + str(date[0])[2:]
 
 # Function to save article list to file
 def save_function(article_list):
-    fname = 'articles' + datestamp + '.json'
+    fname = 'articles/articles' + datestamp + '.json'
 
     # Check if file already exists
     if os.path.isfile(fname):
@@ -34,7 +34,7 @@ def save_function(article_list):
 
 # Creates HTML page using info pulled from articles.txt
 def createHTML(fname):
-    with open('data' + datestamp + '.html', 'w') as f:
+    with open('data/data' + datestamp + '.html', 'w') as f:
         inner = """<!DOCTYPE html>
         <html>
         <head><title>Data: Week {}</title>
@@ -163,8 +163,8 @@ def main(argv):
             rss(f['link'], f['src'], kwand, kwor)
 
         print('Finished scraping')
-        createHTML('articles' + datestamp + '.json')
-        webbrowser.open_new_tab('data' + datestamp + '.html')
+        createHTML('articles/articles' + datestamp + '.json')
+        webbrowser.open_new_tab('data/data' + datestamp + '.html')
 
     else:
         print("No search terms(keywords) have been provided, try using -a or -o. Exiting...")
