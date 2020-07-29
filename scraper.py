@@ -4,6 +4,7 @@ import sys, getopt, os
 import webbrowser
 import datetime
 from bs4 import BeautifulSoup
+import lxml
 
 date = datetime.date.today().isocalendar()
 datestamp = str(date[1]) + '_' + str(date[0])[2:]
